@@ -1,0 +1,152 @@
+/* 1. GLOBAL RESET & FONTS */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5; /* Light grey background */
+    color: #333;
+    padding: 20px;
+}
+
+/* 2. LAYOUT CONTAINER */
+.container {
+    max-width: 800px;
+    margin: 0 auto; /* Center the content */
+}
+
+/* 3. HEADER */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1a202c;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+header p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+/* 4. CARDS (The White Boxes) */
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 15px;
+}
+
+/* 5. BUTTONS */
+button {
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.secondary-btn {
+    background-color: #e2e8f0;
+    color: #4a5568;
+    padding: 8px 16px;
+}
+
+.secondary-btn:hover {
+    background-color: #cbd5e0;
+}
+
+/* 6. DASHBOARD LIST (The Student Cards) */
+.dashboard-list {
+    list-style: none;
+    display: grid;
+    gap: 15px;
+}
+
+.student-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    transition: transform 0.2s;
+}
+
+.student-card:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 7. TEXT STYLING */
+.card-info strong {
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+.class-tag {
+    background: #ebf8ff;
+    color: #3182ce;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.card-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* 8. WARNING COLORS (The Important Part!) ⚠️ */
+
+/* Default Badge */
+.card-badge {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    background: #edf2f7;
+    color: #718096;
+}
+
+/* High Danger (Red Border + Red Badge) */
+.warn-consecutive {
+    border-left: 5px solid #e53e3e; /* Red Left Border */
+}
+.warn-consecutive .card-badge {
+    background: #fff5f5;
+    color: #c53030;
+    border: 1px solid #fc8181;
+}
+
+/* Medium Danger (Orange/Yellow) */
+.warn-total {
+    border-left: 5px solid #d69e2e; /* Yellow Left Border */
+}
+.warn-total .card-badge {
+    background: #fffff0;
+    color: #b7791f;
+    border: 1px solid #f6e05e;
+}

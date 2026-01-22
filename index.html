@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Hadir - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Sistem Ponteng Sekolah</h1>
+            <p>Live Monitoring Dashboard</p>
+        </header>
+
+        <div class="card">
+            <div class="header-row">
+                <h2>Current Warnings</h2>
+                <button onclick="loadDashboard()" class="secondary-btn">Refresh Data</button>
+            </div>
+            
+            <div id="dashboardData">
+                <p>Scanning attendance logs...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
