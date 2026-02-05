@@ -22,7 +22,7 @@ function loadDashboard() {
 
         let html = '<ul class="dashboard-list">';
         
-        // Sort by warning level (High to Low) so worst cases are at the top
+        // Sort: Murid paling bermasalah di atas
         data.dashboard.sort((a, b) => b.Consecutive_Warn_Level - a.Consecutive_Warn_Level);
 
         data.dashboard.forEach(student => {
@@ -38,16 +38,33 @@ function loadDashboard() {
                 warningText = `⚠️ Non-Consecutive Warning Level ${student.NonConsec_Warn_Level}`;
             }
 
+            // --- LOGIK BARU: Susun Tarikh ---
+            // Kita gabungkan array tarikh menjadi satu string panjang
+            let datesListHtml = "";
+            if (student.All_Dates && student.All_Dates.length > 0) {
+                datesListHtml = `
+                    <details class="date-details">
+                        <summary>Lihat semua ${student.Total_Absence} tarikh</summary>
+                        <p class="date-list">${student.All_Dates.join(', ')}</p>
+                    </details>
+                `;
+            }
+            // ---------------------------------
+
             html += `
                 <li class="student-card ${warningClass}">
                     <div class="card-info">
                         <strong>${student.Name}</strong> <span class="class-tag">${student.Class}</span><br>
                         <small>Last Absent: ${student.Last_Absent_Date}</small>
                     </div>
+                    
                     <div class="card-stats">
                         <span class="stat">🔥 Streak: ${student.Current_Streak}</span>
                         <span class="stat">Total: ${student.Total_Absence}</span>
                     </div>
+
+                    ${datesListHtml} 
+                    
                     <div class="card-badge">${warningText}</div>
                 </li>
             `;
