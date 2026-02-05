@@ -1,17 +1,15 @@
 // CONFIGURATION
-// ⚠️ PASTIKAN ANDA MASUKKAN URL WEB APP ANDA DI SINI
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6zN_PJSdm7BtScD20me4JfkwkxAPOU52U5RwqsD8yg9hfn-UNfyoc_go2b_7R4pcVKw/exec"; 
 
-// GLOBAL VARIABLE: Simpan data murid di sini untuk carian pantas
+// GLOBAL VARIABLE
 let allStudentsData = [];
 
 // START APP
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard(); 
-    setupSearchListeners(); // Hidupkan fungsi carian
 });
 
-// 1. FETCH DATA DARI GOOGLE SHEET
+// 1. FETCH DATA
 function loadDashboard() {
     const dashboardDiv = document.getElementById('dashboardData');
     dashboardDiv.innerHTML = "<p>Scanning attendance logs...</p>";
@@ -19,17 +17,15 @@ function loadDashboard() {
     fetch(WEB_APP_URL)
     .then(response => response.json())
     .then(data => {
-        
-        // A. Proses Graf
         if (data.dashboard) {
-            processAndDrawCharts(data.dashboard);
-            
-            // B. SIMPAN DATA KE VARIABLE GLOBAL
-            // Sort data siap-siap (paling kritikal di atas)
+            // Sort data siap-siap
             data.dashboard.sort((a, b) => b.Consecutive_Warn_Level - a.Consecutive_Warn_Level);
             allStudentsData = data.dashboard; 
 
-            // C. Lukis Senarai Penuh Mula-mula
+            // Lukis Graf (Sekarang ada fungsi klik!)
+            processAndDrawCharts(data.dashboard);
+            
+            // Papar Senarai Penuh
             renderStudentList(allStudentsData);
         } else {
              dashboardDiv.innerHTML = "<p>✅ Tiada rekod ketidakhadiran.</p>";
@@ -37,41 +33,35 @@ function loadDashboard() {
     })
     .catch(error => {
         console.error('Error:', error);
-        dashboardDiv.innerHTML = "<p>Error loading data. Sila semak Console (F12).</p>";
+        dashboardDiv.innerHTML = "<p>Error loading data.</p>";
     });
 }
 
-// 2. FUNGSI CARIAN (SINGLE SEARCH BAR) 🔍
-function setupSearchListeners() {
-    const searchInput = document.getElementById('searchInput');
-
-    // Safety check: Jika kotak carian tiada dalam HTML, jangan jalankan kod ini
-    if (!searchInput) {
-        console.error("Ralat: Elemen id='searchInput' tidak dijumpai dalam HTML.");
-        return;
-    }
-
-    searchInput.addEventListener('keyup', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-
-        const filteredStudents = allStudentsData.filter(student => {
-            const name = student.Name.toLowerCase();
-            const className = String(student.Class).toLowerCase();
-            
-            // Cari dalam Nama ATAU Kelas
-            return name.includes(searchTerm) || className.includes(searchTerm);
-        });
-
-        renderStudentList(filteredStudents);
-    });
+// 2. FUNGSI RESET FILTER (Kembali asal) 🔄
+function resetFilter() {
+    document.getElementById('listTitle').innerText = "Senarai Murid Bermasalah (Semua)";
+    renderStudentList(allStudentsData);
 }
 
-// 3. FUNGSI LUKIS SENARAI (Render List) 📝
+// 3. FUNGSI FILTER DARI GRAF (Dipanggil bila graf diklik) 🖱️
+function filterByYear(yearDigit) {
+    // Tapis murid yang kelasnya bermula dengan digit tahun (cth: "5")
+    const filtered = allStudentsData.filter(s => {
+        const className = String(s.Class).trim();
+        return className.startsWith(yearDigit);
+    });
+
+    // Kemaskini Tajuk & Senarai
+    document.getElementById('listTitle').innerText = `Senarai Murid: Tahun ${yearDigit}`;
+    renderStudentList(filtered);
+}
+
+// 4. LUKIS SENARAI 📝
 function renderStudentList(students) {
     const dashboardDiv = document.getElementById('dashboardData');
 
     if (students.length === 0) {
-        dashboardDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096;'>🔍 Tiada murid dijumpai.</p>";
+        dashboardDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096;'>🔍 Tiada murid untuk tahun ini.</p>";
         return;
     }
 
@@ -81,7 +71,6 @@ function renderStudentList(students) {
         let warningClass = "no-warn";
         let warningText = "No Warnings";
 
-        // Logic Warna Warning
         if (student.Consecutive_Warn_Level > 0) {
             warningClass = "warn-consecutive";
             warningText = `⚠️ Consecutive Warning Level ${student.Consecutive_Warn_Level}`;
@@ -90,7 +79,6 @@ function renderStudentList(students) {
             warningText = `⚠️ Non-Consecutive Warning Level ${student.NonConsec_Warn_Level}`;
         }
 
-        // Logic Dropdown Tarikh
         let datesListHtml = "";
         if (student.All_Dates && student.All_Dates.length > 0) {
             datesListHtml = `
@@ -107,14 +95,11 @@ function renderStudentList(students) {
                     <strong>${student.Name}</strong> <span class="class-tag">${student.Class}</span><br>
                     <small>Terakhir Ponteng: ${student.Last_Absent_Date}</small>
                 </div>
-                
                 <div class="card-stats">
                     <span class="stat">🔥 Streak: ${student.Current_Streak}</span>
                     <span class="stat">Total: ${student.Total_Absence}</span>
                 </div>
-
                 ${datesListHtml}
-                
                 <div class="card-badge">${warningText}</div>
             </li>
         `;
@@ -123,24 +108,23 @@ function renderStudentList(students) {
     dashboardDiv.innerHTML = html;
 }
 
-// 4. FUNGSI LUKIS GRAF 📊
+// 5. LUKIS GRAF (Dengan Event Listener) 📊
 function processAndDrawCharts(students) {
     if (!students) return;
 
+    // Kira Data
     let totalStudents = students.length;
-    let under10 = 0;
-    let over10 = 0;
+    let under10 = 0, over10 = 0;
     let yearCounts = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
 
     students.forEach(s => {
-        if (s.Total_Absence >= 10) over10++;
-        else under10++;
-
+        if (s.Total_Absence >= 10) over10++; else under10++;
         let className = String(s.Class || "").trim(); 
         let firstChar = className.charAt(0);
         if (yearCounts[firstChar] !== undefined) yearCounts[firstChar]++;
     });
 
+    // Graf 1: Pie Chart (Ringkasan)
     const ctxSummary = document.getElementById('summaryChart');
     if (ctxSummary) {
         if (window.myPieChart) window.myPieChart.destroy();
@@ -165,25 +149,44 @@ function processAndDrawCharts(students) {
         });
     }
 
+    // Graf 2: Bar Chart (INTERAKTIF) 🖱️
     const ctxYear = document.getElementById('yearChart');
     if (ctxYear) {
         if (window.myBarChart) window.myBarChart.destroy();
         window.myBarChart = new Chart(ctxYear.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Thn 1', 'Thn 2', 'Thn 3', 'Thn 4', 'Thn 5', 'Thn 6'],
+                labels: ['Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'Tahun 6'],
                 datasets: [{
                     label: 'Bilangan Murid',
                     data: [yearCounts["1"], yearCounts["2"], yearCounts["3"], yearCounts["4"], yearCounts["5"], yearCounts["6"]],
-                    backgroundColor: '#4299e1',
-                    borderRadius: 4
+                    backgroundColor: '#4299e1', // Biru Biasa
+                    hoverBackgroundColor: '#2b6cb0', // Biru Gelap bila hover
+                    borderRadius: 4,
+                    cursor: 'pointer' // Tunjuk cursor tangan
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-                plugins: { legend: { display: false } }
+                plugins: { legend: { display: false } },
+                
+                // --- EVENT LISTENER UNTUK KLIK ---
+                onClick: (e, activeElements) => {
+                    if (activeElements.length > 0) {
+                        // Dapat index bar yang diklik (0 = Tahun 1, 1 = Tahun 2...)
+                        const index = activeElements[0].index;
+                        const yearSelected = index + 1; // Tukar index jadi nombor Tahun
+                        
+                        // Panggil fungsi filter
+                        filterByYear(String(yearSelected));
+                    }
+                },
+                onHover: (event, chartElement) => {
+                    // Tukar cursor jadi 'pointer' bila lalu atas bar
+                    event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                }
             }
         });
     }

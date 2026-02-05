@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Dashboard</title>
+    <title>Sistem Hadir - Dashboard</title>
     <link rel="stylesheet" href="style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,7 +12,7 @@
 
     <div class="container">
         <header>
-            <h1>ABSENTEES WARNING SYSTEM SK BANDAR TAWAU</h1>
+            <h1>Sistem Ponteng Sekolah</h1>
             <p>Live Monitoring Dashboard</p>
         </header>
 
@@ -25,7 +25,7 @@
             </div>
             
             <div class="card chart-card">
-                <h3>Pecahan Mengikut Tahun</h3>
+                <h3>Pecahan Mengikut Tahun (Klik Bar untuk Tapis)</h3>
                 <div class="chart-wrapper">
                     <canvas id="yearChart"></canvas>
                 </div>
@@ -34,12 +34,8 @@
 
         <div class="card">
             <div class="header-row">
-                <h2>Senarai Murid Bermasalah</h2>
-                <button onclick="loadDashboard()" class="secondary-btn">Refresh Data</button>
-            </div>
-
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="🔍 Cari Nama Murid atau Kelas (Contoh: 'Ali' atau '5 Kreatif')..." class="search-input">
+                <h2 id="listTitle">Senarai Murid Bermasalah</h2>
+                <button onclick="resetFilter()" class="secondary-btn">Reset / Tunjuk Semua</button>
             </div>
             
             <div id="dashboardData">
