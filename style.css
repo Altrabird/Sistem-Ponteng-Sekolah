@@ -201,3 +201,17 @@ summary {
         grid-template-columns: 1fr;
     }
 }
+/* Tambah di bahagian bawah fail style.css */
+
+.chart-wrapper {
+    position: relative;
+    height: 250px; /* Tetapkan tinggi graf */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
