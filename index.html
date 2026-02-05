@@ -1,37 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absentees Warning System- SK Bandar Tawau</title>
+    <title>AWS Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>AWS (Absentees Warning System)</h1>
+            <h1>ABSENTEES WARNING SYSTEM SK BANDAR TAWAU</h1>
             <p>Live Monitoring Dashboard</p>
         </header>
 
-   <div class="charts-container">
-    <div class="card chart-card">
-        <h3>Analisis Kehadiran</h3>
-        <div class="chart-wrapper"> <canvas id="summaryChart"></canvas>
+        <div class="charts-container">
+            <div class="card chart-card">
+                <h3>Analisis Kehadiran</h3>
+                <div class="chart-wrapper">
+                    <canvas id="summaryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card chart-card">
+                <h3>Pecahan Mengikut Tahun</h3>
+                <div class="chart-wrapper">
+                    <canvas id="yearChart"></canvas>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card chart-card">
-        <h3>Pecahan Mengikut Tahun</h3>
-        <div class="chart-wrapper"> <canvas id="yearChart"></canvas>
-        </div>
-    </div>
-</div>
 
         <div class="card">
             <div class="header-row">
                 <h2>Senarai Murid Bermasalah</h2>
                 <button onclick="loadDashboard()" class="secondary-btn">Refresh Data</button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchName" placeholder="🔍 Cari Nama Murid..." class="search-input">
+                <input type="text" id="searchClass" placeholder="🏫 Cari Kelas (Contoh: 5 Kreatif)..." class="search-input">
             </div>
             
             <div id="dashboardData">
