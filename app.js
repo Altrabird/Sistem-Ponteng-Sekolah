@@ -1,4 +1,5 @@
 // CONFIGURATION
+// ⚠️ PASTIKAN ANDA MASUKKAN URL WEB APP ANDA DI SINI
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx6zN_PJSdm7BtScD20me4JfkwkxAPOU52U5RwqsD8yg9hfn-UNfyoc_go2b_7R4pcVKw/exec"; 
 
 // GLOBAL VARIABLE: Simpan data murid di sini untuk carian pantas
@@ -24,7 +25,7 @@ function loadDashboard() {
             processAndDrawCharts(data.dashboard);
             
             // B. SIMPAN DATA KE VARIABLE GLOBAL
-            // Sort data siap-siap
+            // Sort data siap-siap (paling kritikal di atas)
             data.dashboard.sort((a, b) => b.Consecutive_Warn_Level - a.Consecutive_Warn_Level);
             allStudentsData = data.dashboard; 
 
@@ -36,42 +37,41 @@ function loadDashboard() {
     })
     .catch(error => {
         console.error('Error:', error);
-        dashboardDiv.innerHTML = "<p>Error loading data. Sila semak Console.</p>";
+        dashboardDiv.innerHTML = "<p>Error loading data. Sila semak Console (F12).</p>";
     });
 }
 
-// 2. FUNGSI CARIAN (Event Listeners) 🔍
+// 2. FUNGSI CARIAN (SINGLE SEARCH BAR) 🔍
 function setupSearchListeners() {
-    const nameInput = document.getElementById('searchName');
-    const classInput = document.getElementById('searchClass');
+    const searchInput = document.getElementById('searchInput');
 
-    // Fungsi untuk menapis data
-    function filterData() {
-        const nameValue = nameInput.value.toLowerCase();
-        const classValue = classInput.value.toLowerCase();
+    // Safety check: Jika kotak carian tiada dalam HTML, jangan jalankan kod ini
+    if (!searchInput) {
+        console.error("Ralat: Elemen id='searchInput' tidak dijumpai dalam HTML.");
+        return;
+    }
+
+    searchInput.addEventListener('keyup', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
 
         const filteredStudents = allStudentsData.filter(student => {
-            const matchName = student.Name.toLowerCase().includes(nameValue);
-            // Guna String() untuk elak error jika kelas itu nombor
-            const matchClass = String(student.Class).toLowerCase().includes(classValue);
-            return matchName && matchClass;
+            const name = student.Name.toLowerCase();
+            const className = String(student.Class).toLowerCase();
+            
+            // Cari dalam Nama ATAU Kelas
+            return name.includes(searchTerm) || className.includes(searchTerm);
         });
 
         renderStudentList(filteredStudents);
-    }
-
-    // Dengar setiap kali user menaip (keyup)
-    nameInput.addEventListener('keyup', filterData);
-    classInput.addEventListener('keyup', filterData);
+    });
 }
 
 // 3. FUNGSI LUKIS SENARAI (Render List) 📝
-// Fungsi ini dipanggil oleh loadDashboard() DAN filterData()
 function renderStudentList(students) {
     const dashboardDiv = document.getElementById('dashboardData');
 
     if (students.length === 0) {
-        dashboardDiv.innerHTML = "<p>🔍 Tiada murid dijumpai dengan carian ini.</p>";
+        dashboardDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096;'>🔍 Tiada murid dijumpai.</p>";
         return;
     }
 
@@ -123,7 +123,7 @@ function renderStudentList(students) {
     dashboardDiv.innerHTML = html;
 }
 
-// 4. FUNGSI LUKIS GRAF (Kekal Sama) 📊
+// 4. FUNGSI LUKIS GRAF 📊
 function processAndDrawCharts(students) {
     if (!students) return;
 
@@ -171,7 +171,7 @@ function processAndDrawCharts(students) {
         window.myBarChart = new Chart(ctxYear.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'Tahun 6'],
+                labels: ['Thn 1', 'Thn 2', 'Thn 3', 'Thn 4', 'Thn 5', 'Thn 6'],
                 datasets: [{
                     label: 'Bilangan Murid',
                     data: [yearCounts["1"], yearCounts["2"], yearCounts["3"], yearCounts["4"], yearCounts["5"], yearCounts["6"]],
