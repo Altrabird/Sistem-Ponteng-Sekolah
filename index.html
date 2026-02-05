@@ -5,18 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Hadir - Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Sistem Ponteng Sekolah SK Bandar Tawau</h1>
+            <h1>Sistem Ponteng Sekolah</h1>
             <p>Live Monitoring Dashboard</p>
         </header>
 
+        <div class="charts-container">
+            <div class="card chart-card">
+                <h3>Analisis Kehadiran</h3>
+                <canvas id="summaryChart"></canvas> </div>
+            <div class="card chart-card">
+                <h3>Pecahan Mengikut Tahun</h3>
+                <canvas id="yearChart"></canvas> </div>
+        </div>
+
         <div class="card">
             <div class="header-row">
-                <h2>Current Warnings</h2>
+                <h2>Senarai Murid Bermasalah</h2>
                 <button onclick="loadDashboard()" class="secondary-btn">Refresh Data</button>
             </div>
             
