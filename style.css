@@ -150,3 +150,25 @@ button {
     color: #b7791f;
     border: 1px solid #f6e05e;
 }
+/* Styling untuk dropdown tarikh */
+details.date-details {
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+}
+
+summary {
+    font-weight: 600;
+    color: #3182ce;
+    outline: none;
+}
+
+.date-list {
+    background: #f7fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 5px;
+    line-height: 1.6;
+    border: 1px solid #edf2f7;
+}
