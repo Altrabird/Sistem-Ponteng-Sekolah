@@ -7,6 +7,7 @@ let allStudentsData = [];
 // START APP
 document.addEventListener('DOMContentLoaded', () => {
     loadDashboard(); 
+    setupSearchListeners(); // Hidupkan fungsi search
 });
 
 // 1. FETCH DATA
@@ -22,7 +23,7 @@ function loadDashboard() {
             data.dashboard.sort((a, b) => b.Consecutive_Warn_Level - a.Consecutive_Warn_Level);
             allStudentsData = data.dashboard; 
 
-            // Lukis Graf (Sekarang ada fungsi klik!)
+            // Lukis Graf
             processAndDrawCharts(data.dashboard);
             
             // Papar Senarai Penuh
@@ -37,31 +38,60 @@ function loadDashboard() {
     });
 }
 
-// 2. FUNGSI RESET FILTER (Kembali asal) 🔄
-function resetFilter() {
-    document.getElementById('listTitle').innerText = "Senarai Murid Bermasalah (Semua)";
-    renderStudentList(allStudentsData);
+// 2. FUNGSI CARIAN (SEARCH BAR) 🔍
+function setupSearchListeners() {
+    const searchInput = document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+
+        // Tukar tajuk supaya user tahu mereka sedang mencari
+        document.getElementById('listTitle').innerText = `Hasil Carian: "${e.target.value}"`;
+
+        const filteredStudents = allStudentsData.filter(student => {
+            const name = student.Name.toLowerCase();
+            const className = String(student.Class).toLowerCase();
+            
+            // Cari dalam Nama ATAU Kelas
+            return name.includes(searchTerm) || className.includes(searchTerm);
+        });
+
+        renderStudentList(filteredStudents);
+    });
 }
 
-// 3. FUNGSI FILTER DARI GRAF (Dipanggil bila graf diklik) 🖱️
+// 3. FUNGSI FILTER DARI GRAF (KLIK BAR) 🖱️
 function filterByYear(yearDigit) {
-    // Tapis murid yang kelasnya bermula dengan digit tahun (cth: "5")
+    // Kosongkan search bar supaya tidak keliru
+    document.getElementById('searchInput').value = "";
+    
+    // Tapis murid tahun tersebut
     const filtered = allStudentsData.filter(s => {
         const className = String(s.Class).trim();
         return className.startsWith(yearDigit);
     });
 
-    // Kemaskini Tajuk & Senarai
+    // Kemaskini Tajuk
     document.getElementById('listTitle').innerText = `Senarai Murid: Tahun ${yearDigit}`;
     renderStudentList(filtered);
 }
 
-// 4. LUKIS SENARAI 📝
+// 4. FUNGSI RESET (KEMBALI ASAL) 🔄
+function resetFilter() {
+    // 1. Reset Tajuk
+    document.getElementById('listTitle').innerText = "Senarai Murid Bermasalah (Semua)";
+    // 2. Kosongkan Search Bar
+    document.getElementById('searchInput').value = "";
+    // 3. Tunjuk Semua Data
+    renderStudentList(allStudentsData);
+}
+
+// 5. LUKIS SENARAI 📝
 function renderStudentList(students) {
     const dashboardDiv = document.getElementById('dashboardData');
 
     if (students.length === 0) {
-        dashboardDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096;'>🔍 Tiada murid untuk tahun ini.</p>";
+        dashboardDiv.innerHTML = "<p style='text-align:center; padding:20px; color:#718096;'>🔍 Tiada murid dijumpai.</p>";
         return;
     }
 
@@ -108,11 +138,10 @@ function renderStudentList(students) {
     dashboardDiv.innerHTML = html;
 }
 
-// 5. LUKIS GRAF (Dengan Event Listener) 📊
+// 6. LUKIS GRAF 📊
 function processAndDrawCharts(students) {
     if (!students) return;
 
-    // Kira Data
     let totalStudents = students.length;
     let under10 = 0, over10 = 0;
     let yearCounts = { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 };
@@ -124,7 +153,6 @@ function processAndDrawCharts(students) {
         if (yearCounts[firstChar] !== undefined) yearCounts[firstChar]++;
     });
 
-    // Graf 1: Pie Chart (Ringkasan)
     const ctxSummary = document.getElementById('summaryChart');
     if (ctxSummary) {
         if (window.myPieChart) window.myPieChart.destroy();
@@ -149,21 +177,20 @@ function processAndDrawCharts(students) {
         });
     }
 
-    // Graf 2: Bar Chart (INTERAKTIF) 🖱️
     const ctxYear = document.getElementById('yearChart');
     if (ctxYear) {
         if (window.myBarChart) window.myBarChart.destroy();
         window.myBarChart = new Chart(ctxYear.getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'Tahun 6'],
+                labels: ['Thn 1', 'Thn 2', 'Thn 3', 'Thn 4', 'Thn 5', 'Thn 6'],
                 datasets: [{
                     label: 'Bilangan Murid',
                     data: [yearCounts["1"], yearCounts["2"], yearCounts["3"], yearCounts["4"], yearCounts["5"], yearCounts["6"]],
-                    backgroundColor: '#4299e1', // Biru Biasa
-                    hoverBackgroundColor: '#2b6cb0', // Biru Gelap bila hover
+                    backgroundColor: '#4299e1',
+                    hoverBackgroundColor: '#2b6cb0',
                     borderRadius: 4,
-                    cursor: 'pointer' // Tunjuk cursor tangan
+                    cursor: 'pointer'
                 }]
             },
             options: {
@@ -171,20 +198,14 @@ function processAndDrawCharts(students) {
                 maintainAspectRatio: false,
                 scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
                 plugins: { legend: { display: false } },
-                
-                // --- EVENT LISTENER UNTUK KLIK ---
                 onClick: (e, activeElements) => {
                     if (activeElements.length > 0) {
-                        // Dapat index bar yang diklik (0 = Tahun 1, 1 = Tahun 2...)
                         const index = activeElements[0].index;
-                        const yearSelected = index + 1; // Tukar index jadi nombor Tahun
-                        
-                        // Panggil fungsi filter
+                        const yearSelected = index + 1;
                         filterByYear(String(yearSelected));
                     }
                 },
                 onHover: (event, chartElement) => {
-                    // Tukar cursor jadi 'pointer' bila lalu atas bar
                     event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                 }
             }
